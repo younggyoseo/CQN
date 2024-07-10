@@ -1,0 +1,6 @@
+defaults:
+  - default
+  - _self_
+
+task_name: put_money_in_safe
+episode_length: 150

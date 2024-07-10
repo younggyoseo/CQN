@@ -1,0 +1,6 @@
+defaults:
+  - default
+  - _self_
+
+task_name: reach_target
+episode_length: 50

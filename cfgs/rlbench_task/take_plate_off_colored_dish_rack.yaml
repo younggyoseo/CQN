@@ -1,0 +1,6 @@
+defaults:
+  - default
+  - _self_
+
+task_name: take_plate_off_colored_dish_rack
+episode_length: 150

@@ -1,0 +1,6 @@
+defaults:
+  - default
+  - _self_
+
+task_name: meat_on_gril
+episode_length: 150

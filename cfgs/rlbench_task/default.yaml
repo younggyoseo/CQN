@@ -1,0 +1,7 @@
+dataset_root: ''
+camera_shape: [84,84]
+camera_keys: [front,wrist,left_shoulder,right_shoulder]
+state_keys: [joint_positions,gripper_open]
+renderer: opengl3
+num_demos: 100
+num_train_frames: 30250

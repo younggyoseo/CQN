@@ -1,0 +1,6 @@
+defaults:
+  - default
+  - _self_
+
+task_name: slide_block_to_target
+episode_length: 150

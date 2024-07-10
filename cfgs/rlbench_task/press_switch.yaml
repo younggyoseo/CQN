@@ -1,0 +1,6 @@
+defaults:
+  - default
+  - _self_
+
+task_name: press_switch
+episode_length: 100

@@ -1,0 +1,6 @@
+defaults:
+  - default
+  - _self_
+
+task_name: insert_usb_in_computer
+episode_length: 100

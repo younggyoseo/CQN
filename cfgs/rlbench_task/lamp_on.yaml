@@ -1,0 +1,6 @@
+defaults:
+  - default
+  - _self_
+
+task_name: lamp_on
+episode_length: 100

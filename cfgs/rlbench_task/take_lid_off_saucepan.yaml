@@ -1,0 +1,6 @@
+defaults:
+  - default
+  - _self_
+
+task_name: take_lid_off_saucepan
+episode_length: 100
