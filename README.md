@@ -67,7 +67,7 @@ This repository is based on public implementation of [DrQ-v2](https://github.com
 @article{seo2024continuous,
   title={Continuous Control with Coarse-to-fine Reinforcement Learning},
   author={Seo, Younggyo and Uru{\c{c}}, Jafar and James, Stephen},
-  journal={arXiv preprint arXiv:xxxx.xxxxx},
+  journal={arXiv preprint arXiv:2407.07787},
   year={2024}
 }
 ```
