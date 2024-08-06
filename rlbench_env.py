@@ -275,9 +275,11 @@ class RLBench:
     def extract_delta_joint_action(self, obs, next_obs):
         action = np.concatenate(
             [
-                next_obs.misc["joint_position_action"][:-1] - obs.joint_positions
-                if "joint_position_action" in next_obs.misc
-                else next_obs.joint_positions - obs.joint_positions,
+                (
+                    next_obs.misc["joint_position_action"][:-1] - obs.joint_positions
+                    if "joint_position_action" in next_obs.misc
+                    else next_obs.joint_positions - obs.joint_positions
+                ),
                 [1.0 if next_obs.gripper_open == 1 else 0.0],
             ]
         ).astype(np.float32)

@@ -1,0 +1,82 @@
+defaults:
+  - _self_
+  - rlbench_task@_global_: reach_target
+  - override hydra/launcher: submitit_local
+
+# task settings
+frame_stack: 8
+action_repeat: 1
+discount: 0.99
+# train settings
+num_seed_frames: 0
+# eval
+eval_every_frames: 2500
+num_eval_episodes: 25
+# snapshot
+save_snapshot: false
+# replay buffer
+replay_buffer_size: 1000000
+replay_buffer_num_workers: 4
+nstep: 1
+batch_size: 256
+use_relabeling: true
+# misc
+seed: 1
+device: cuda
+save_video: true
+save_train_video: false
+use_tb: true
+use_wandb: false
+# experiment
+experiment: exp
+# agent
+lr: 1e-4
+weight_decay: 0.1
+feature_dim: 64
+do_always_bootstrap: false # setting to True can sometimes work better
+num_update_steps: 1
+# environment
+arm_max_velocity: 2.0
+arm_max_acceleration: 8.0
+
+agent:
+  _target_: drqv2plus.DrQV2Agent
+  rgb_obs_shape: ??? # to be specified later
+  low_dim_obs_shape: ??? # to be specified later
+  action_shape: ??? # to be specified later
+  device: ${device}
+  lr: ${lr}
+  weight_decay: ${weight_decay}
+  feature_dim: ${feature_dim}
+  hidden_dim: 1024
+  use_distributional_critic: true
+  distributional_critic_limit: 2.0
+  distributional_critic_atoms: 101
+  distributional_critic_transform: false
+  bc_lambda: 1.0
+  critic_target_tau: 0.01
+  num_expl_steps: 0
+  update_every_steps: 1
+  stddev_schedule: 0.01
+  stddev_clip: 0.3
+  use_logger: ??? # to be specified later
+
+wandb:
+  project: cqn
+  entity: younggyo
+  name: name
+
+hydra:
+  run:
+    dir: ./exp_local/drqv2plus_pixel_rlbench/${now:%Y%m%d%H%M%S}
+  sweep:
+    dir: ./exp/${now:%Y.%m.%d}/${now:%H%M}_${agent_cfg.experiment}
+    subdir: ${hydra.job.num}
+  launcher:
+    timeout_min: 4300
+    cpus_per_task: 10
+    gpus_per_node: 1
+    tasks_per_node: 1
+    mem_gb: 160
+    nodes: 1
+    submitit_folder: ./exp/${now:%Y.%m.%d}/${now:%H%M%S}_${agent_cfg.experiment}/.slurm

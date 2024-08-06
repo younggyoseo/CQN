@@ -160,3 +160,59 @@ class DemoMergedIterator:
         for i in range(len(items1)):
             new_items.append(np.concatenate([items1[i], items2[i]], 0))
         return tuple(new_items)
+
+
+"""
+For distributional critic: https://arxiv.org/pdf/1707.06887.pdf
+"""
+
+
+def signed_hyperbolic(x: torch.Tensor, eps: float = 1e-3) -> torch.Tensor:
+    """Signed hyperbolic transform, inverse of signed_parabolic."""
+    return torch.sign(x) * (torch.sqrt(torch.abs(x) + 1) - 1) + eps * x
+
+
+def signed_parabolic(x: torch.Tensor, eps: float = 1e-3) -> torch.Tensor:
+    """Signed parabolic transform, inverse of signed_hyperbolic."""
+    z = torch.sqrt(1 + 4 * eps * (eps + 1 + torch.abs(x))) / 2 / eps - 1 / 2 / eps
+    return torch.sign(x) * (torch.square(z) - 1)
+
+
+def from_categorical(
+    distribution, limit=20, offset=0.0, logits=True, transformation=True
+):
+    distribution = distribution.float().squeeze(-1)  # Avoid any fp16 shenanigans
+    if logits:
+        distribution = torch.softmax(distribution, -1)
+    num_atoms = distribution.shape[-1]
+    shift = limit * 2 / (num_atoms - 1)
+    weights = (
+        torch.linspace(
+            -(num_atoms // 2), num_atoms // 2, num_atoms, device=distribution.device
+        )
+        .float()
+        .unsqueeze(-1)
+    )
+    if transformation:
+        out = signed_parabolic((distribution @ weights) * shift) - offset
+    else:
+        out = (distribution @ weights) * shift - offset
+    return out
+
+
+def to_categorical(value, limit=20, offset=0.0, num_atoms=251, transformation=True):
+    value = value.float() + offset  # Avoid any fp16 shenanigans
+    shift = limit * 2 / (num_atoms - 1)
+    if transformation:
+        value = signed_hyperbolic(value) / shift
+    else:
+        value = value / shift
+    value = value.clamp(-(num_atoms // 2), num_atoms // 2)
+    distribution = torch.zeros(value.shape[0], num_atoms, 1, device=value.device)
+    lower = value.floor().long() + num_atoms // 2
+    upper = value.ceil().long() + num_atoms // 2
+    upper_weight = value % 1
+    lower_weight = 1 - upper_weight
+    distribution.scatter_add_(-2, lower.unsqueeze(-1), lower_weight.unsqueeze(-1))
+    distribution.scatter_add_(-2, upper.unsqueeze(-1), upper_weight.unsqueeze(-1))
+    return distribution
